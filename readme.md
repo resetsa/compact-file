@@ -26,16 +26,6 @@
 compress-pdf.ps1 - получение информации о версия ПО.
 
 ```powershell
-PS C:\tools\pdf-compress> .\compress-pdf.ps1 -RootDir c:\temp -AgeDays 1 -ReplaceOriginal $true
-04/09/2022 20:58:44:compress-pdf.ps1 - Start script
-04/09/2022 20:58:44:compress-pdf.ps1 - Set variables
-04/09/2022 20:58:44:compress-pdf.ps1 - Modify path to \\?\c:\temp
-04/09/2022 20:58:44:compress-pdf.ps1 - Clean old jobs ns.comp_pdf*
-04/09/2022 20:58:44:compress-pdf.ps1 - Enum files in \\?\c:\temp\
-04/09/2022 20:58:47:Process-job - Process \\?\c:\temp\pdfs\jpeg_as_pdf.pdf Error
-04/09/2022 20:58:47:compress-pdf.ps1 - Save spaces 0 MB
-04/09/2022 20:58:47:compress-pdf.ps1 - Work time 00:00:03.5156247
-04/09/2022 20:58:47:compress-pdf.ps1 - End script
 PS C:\tools\pdf-compress> .\compress-pdf.ps1 -RootDir c:\temp -AgeDays 1 -ReplaceOriginal $true -MaxProcess 3
 04/09/2022 20:59:25:compress-pdf.ps1 - Start script
 04/09/2022 20:59:25:compress-pdf.ps1 - Set variables
