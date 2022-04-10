@@ -2,64 +2,55 @@
 
 <#
 .SYNOPSIS
-    Script for compress pdf file.
+    Script for compress jpg file.
 .DESCRIPTION
-    Compess PDF file with external tool (GhostScript for windows).
+    Compess JPG file with external tool (ImageMagick for windows).
     Use parallel jobs and write info into alternative NTFS stream.
     Filter file for age in days.
 .NOTES
-    Name: compress-pdf
+    Name: compress-jpg
     Author: Stepanenko S
     Version: 0.1
     DateCreated: 08.04.2022
 .EXAMPLE
-    PS C:\tools\pdf-compress> .\compress-pdf.ps1 -RootDir c:\temp -AgeDays 1 -ReplaceOriginal $true -MaxProcess 3                                                                                                    04/09/2022 20:59:25:compress-pdf.ps1 - Start script
-    04/09/2022 20:59:25:compress-pdf.ps1 - Set variables
-    04/09/2022 20:59:25:compress-pdf.ps1 - Modify path to \\?\c:\temp
-    04/09/2022 20:59:25:compress-pdf.ps1 - Clean old jobs ns.comp_pdf*
-    04/09/2022 20:59:25:compress-pdf.ps1 - Enum files in \\?\c:\temp\
-    04/09/2022 20:59:46:Process-job - Process \\?\c:\temp\pdfs\Diving Deep Into Kubernetes Networking.pdf OK
-    04/09/2022 21:00:00:Process-job - Process \\?\c:\temp\pdfs\CIS_CentOS_Linux_7_Benchmark_v3.0.0.pdf OK
-    04/09/2022 21:00:00:Process-job - Process \\?\c:\temp\pdfs\CIS_Distribution_Independent_Linux_Benchmark_v2.0.0.pdf OK
-    04/09/2022 21:00:07:Process-job - Process \\?\c:\temp\pdfs\Docker Security Adrian Mouat.pdf OK
-    04/09/2022 21:00:07:Process-job - Process \\?\c:\temp\pdfs\jpeg_as_pdf.pdf Error
-    04/09/2022 21:00:24:Process-job - Process \\?\c:\temp\pdfs\Python Programming for Beginners. The Compl Begin Guide.pdf OK
-    04/09/2022 21:00:24:compress-pdf.ps1 - Save spaces 4.59 MB
-    04/09/2022 21:00:24:compress-pdf.ps1 - Work time 00:00:59.1874291
-    04/09/2022 21:00:24:compress-pdf.ps1 - End script
+    PS C:\tools\compress-jpg> .\compress-jpg.ps1 -RootDir C:\temp\jpg\
+    04/10/2022 21:00:08:compress-jpg.ps1 - Start script
+    04/10/2022 21:00:08:compress-jpg.ps1 - Set variables
+    04/10/2022 21:00:08:compress-jpg.ps1 - Modify path to \\?\C:\temp\jpg\
+    04/10/2022 21:00:08:compress-jpg.ps1 - Clean old jobs ns.comp_jpg*
+    04/10/2022 21:00:08:compress-jpg.ps1 - Enum files in \\?\C:\temp\jpg
+    04/10/2022 21:00:20:Process-job - Process \\?\C:\temp\jpg\IMG_20141011_190828.jpg OK
+    04/10/2022 21:00:20:Process-job - Process \\?\C:\temp\jpg\IMG_20141011_190843.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141013_205418.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114833.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114835.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114852.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114944.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114949.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114952.jpg OK
+    04/10/2022 21:00:38:Process-job - Process \\?\C:\temp\jpg\IMG_20141015_114957.jpg OK
+    04/10/2022 21:00:38:compress-jpg.ps1 - Save spaces 0 MB
+    04/10/2022 21:00:38:compress-jpg.ps1 - Work time 00:00:30.0847034
+    04/10/2022 21:00:38:compress-jpg.ps1 - End script
 .EXAMPLE
-    PS C:\tools\compress-pdf> .\compress-pdf.ps1 -RootDir c:\temp -AgeDays 1 -Verbose
-    04/09/2022 21:11:22:compress-pdf.ps1 - Start script
-    04/09/2022 21:11:22:compress-pdf.ps1 - Set variables
-    04/09/2022 21:11:22:compress-pdf.ps1 - Modify path to \\?\c:\temp
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check access to \\?\c:\temp
-    04/09/2022 21:11:22:compress-pdf.ps1 - Clean old jobs ns.comp_pdf*
-    04/09/2022 21:11:22:compress-pdf.ps1 - Enum files in \\?\c:\temp\
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check file \\?\c:\temp\pdfs\CIS_CentOS_Linux_7_Benchmark_v3.0.0.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check file \\?\c:\temp\pdfs\CIS_Distribution_Independent_Linux_Benchmark_v2.0.0.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check file \\?\c:\temp\pdfs\Diving Deep Into Kubernetes Networking.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check file \\?\c:\temp\pdfs\Docker Security Adrian Mouat.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check file \\?\c:\temp\pdfs\jpeg_as_pdf.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Begin process file \\?\c:\temp\pdfs\jpeg_as_pdf.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Run job ns.comp_pdf62598351 for process file \\?\c:\temp\pdfs\jpeg_as_pdf.pdf
-    ПОДРОБНО: 04/09/2022 21:11:22:compress-pdf.ps1 - Check file \\?\c:\temp\pdfs\Python Programming for Beginners. The Compl Begin Guide.pdf
-    04/09/2022 21:11:25:Process-job - Process \\?\c:\temp\pdfs\jpeg_as_pdf.pdf Error
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Errorcode 1
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Error messsage GPL Ghostscript 9.56.1: Unrecoverable error, exit code 1
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Args: filepath_original = \\?\c:\temp\pdfs\jpeg_as_pdf.pdf
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Args: filepath_temp = \\?\c:\temp\pdfs\tmp_jpeg_as_pdf.pdf
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Args: remove_original = False
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Args: alt_streamname = ns.comp_pdf
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Start process C:\tools\gs\gs9.56.1\bin\gswin64c.exe
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Start args -dBATCH -dQUIET -dNOPAUSE -dSAFER -dALLOWPSTRANSPARENCY -dEmbedAllFonts=true -dSubsetFonts=true -dPDFSETTINGS=/ebook
-    -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dColorImageDownsampleThreshold=1 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dGrayImageDownsampleThreshold=1
-    -dMonoImageDownsampleType=/Subsample -dMonoImageResolution=144 -dPassThroughJPEGImages=false -dColorImageFilter=/DCTEncode -dGrayImageFilter=/DCTEncode -dMonoImageFilter=/CCITTFaxEncode -sDEVICE=pdfwrite
-    -sOutputFile="\\?\c:\temp\pdfs\tmp_jpeg_as_pdf.pdf" "\\?\c:\temp\pdfs\jpeg_as_pdf.pdf"
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Process exit with exitcode 1
-    ПОДРОБНО: 04/09/2022 21:11:25:Process-job - ns.comp_pdf62598351 - Remove tmp file \\?\c:\temp\pdfs\tmp_jpeg_as_pdf.pdf
-    04/09/2022 21:11:25:compress-pdf.ps1 - Save spaces 0 MB
-    04/09/2022 21:11:25:compress-pdf.ps1 - Work time 00:00:02.8906258
-    04/09/2022 21:11:25:compress-pdf.ps1 - End script
+    PS C:\tools\compress-jpg> .\compress-jpg.ps1 -RootDir C:\temp\jpg\ -ReplaceOriginal $true -AgeDays 1 -Verbose
+    04/10/2022 21:07:48:compress-jpg.ps1 - Start script
+    04/10/2022 21:07:48:compress-jpg.ps1 - Set variables
+    04/10/2022 21:07:48:compress-jpg.ps1 - Modify path to \\?\C:\temp\jpg\
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check access to \\?\C:\temp\jpg\
+    04/10/2022 21:07:48:compress-jpg.ps1 - Clean old jobs ns.comp_jpg*
+    04/10/2022 21:07:48:compress-jpg.ps1 - Enum files in \\?\C:\temp\jpg
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0653.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0654.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0655.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0656.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0657.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0658.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0659.JPG
+    ПОДРОБНО: 04/10/2022 21:07:48:compress-jpg.ps1 - Check file \\?\C:\temp\jpg\IMG_0660.JPG
+    04/10/2022 21:07:48:compress-jpg.ps1 - Save spaces 0 MB
+    04/10/2022 21:07:48:compress-jpg.ps1 - Work time 00:00:00.0156252
+    04/10/2022 21:07:48:compress-jpg.ps1 - End script
 #>
 
 # set args and validate
@@ -80,9 +71,9 @@ param(
     # Set max parallel compress job
     [int]$MaxProcess=10,
     # Set prefix for compress jobs
-    [string]$JobPrefix='ns.comp_pdf',
+    [string]$JobPrefix='ns.comp_jpg',
     # Set alternative NTFS stream name for saving info
-    [string]$StreamName='ns.comp_pdf',
+    [string]$StreamName='ns.comp_jpg',
     # Set max run time in seconds
     [int]$MaxRunSecond=86400
 )
@@ -140,15 +131,10 @@ $JobScript = {
         }
 
     # set variable
-    $exe = 'C:\tools\gs\gs9.56.1\bin\gswin64c.exe'
+    $exe = 'C:\tools\imagemagick\convert.exe'
     $exe_args = -join @(
-        "-dBATCH -dQUIET -dNOPAUSE -dSAFER -dALLOWPSTRANSPARENCY "
-        "-dEmbedAllFonts=true -dSubsetFonts=true -dPDFSETTINGS=/ebook "
-        "-dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dColorImageDownsampleThreshold=1 "
-        "-dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dGrayImageDownsampleThreshold=1 "
-        "-dMonoImageDownsampleType=/Subsample -dMonoImageResolution=144 "
-        "-dPassThroughJPEGImages=false -dColorImageFilter=/DCTEncode -dGrayImageFilter=/DCTEncode -dMonoImageFilter=/CCITTFaxEncode"
-        " -sDEVICE=pdfwrite -sOutputFile=`"$filepath_temp`" `"$filepath_original`""
+        "-resize 1920^ -strip -interlace Plane -sampling-factor 4:2:0 -quality 90% "
+        "`"$filepath_original`" `"$filepath_temp`""
         )
     
     # create result hashtable
@@ -276,13 +262,13 @@ Write-output "$(Get-date):$(Get-FunctionName) - Set variables"
 $ErrorActionPreference = "continue"
 
 # set vars (maybe in param)
-$Mask = "*.pdf"
+$Mask = "*.jp*g"
 $TmpPrefix = 'tmp_'
 
 $StartTime = get-date
 $EstimatedStopTime = (get-date).addseconds($MaxRunSecond)
 
-# fix for limits 256 chars in path
+# fix for limits 256 chars in var
 if ($RootDir -match '\\\\')
     {
     $RootDir = $RootDir.replace('\\','\\?\UNC\')
@@ -309,20 +295,20 @@ try {
     Get-Job | Where-Object {$_.name -match $JobPrefix} | Remove-Job -Force
     Write-output "$(Get-date):$(Get-FunctionName) - Enum files in $($root.fullname)"
     # main process cycle
-    foreach ($pdf in $root.EnumerateFiles($Mask,[system.io.SearchOption]::AllDirectories))
+    foreach ($file in $root.EnumerateFiles($Mask,[system.io.SearchOption]::AllDirectories))
         {
-        Write-Verbose "$(Get-date):$(Get-FunctionName) - Check file $($pdf.fullname)"
+        Write-Verbose "$(Get-date):$(Get-FunctionName) - Check file $($file.fullname)"
         # select files for processing.
         # compare age and NTFS stream have
-        if (($pdf.LastWriteTime -le $(get-date).adddays(-$AgeDays))-and((get-item -Stream * -LiteralPath "$($pdf.fullname)").stream -notcontains $StreamName))
+        if (($file.LastWriteTime -le $(get-date).adddays(-$AgeDays))-and((get-item -Stream * -LiteralPath "$($file.fullname)").stream -notcontains $StreamName))
             {
-            Write-Verbose "$(Get-date):$(Get-FunctionName) - Begin process file $($pdf.fullname)"
-            $FilepathTmp = Get-PathPre $pdf.fullname $TmpPrefix
+            Write-Verbose "$(Get-date):$(Get-FunctionName) - Begin process file $($file.fullname)"
+            $FilepathTmp = Get-PathPre $file.fullname $TmpPrefix
             # generate name for jobs
             $JobName = $JobPrefix+$(get-random)
-            Write-Verbose "$(Get-date):$(Get-FunctionName) - Run job $JobName for process file $($pdf.fullname)"
+            Write-Verbose "$(Get-date):$(Get-FunctionName) - Run job $JobName for process file $($file.fullname)"
             # start processing job
-            Start-job -Name $JobName -ScriptBlock $JobScript -ArgumentList $($pdf.fullname),$FilepathTmp,$ReplaceOriginal,$StreamName | out-null
+            Start-job -Name $JobName -ScriptBlock $JobScript -ArgumentList $($file.fullname),$FilepathTmp,$ReplaceOriginal,$StreamName | out-null
             # if over MaxPorcess - wait
             while (@(get-job -state Running | Where-Object{$_.name -match $JobPrefix}).count -ge $MaxProcess)
                 {
@@ -331,7 +317,7 @@ try {
                 }
             # process complete job
             Process-job $JobPrefix
-            $ProcessFiles += $pdf.FullName
+            $ProcessFiles += $file.FullName
             }
         # Check runtime limit
         if ($(get-date) -gt $EstimatedStopTime)
