@@ -1,0 +1,26 @@
+[
+  {
+    "scriptName": "c:\\tools\\compress-pdf\\compress-pdf.ps1",
+    "rootDir": "C:\\temp\\pdfs",
+    "ageDays": 1,
+    "replaceOriginal": false,
+    "maxProcess": 10,
+    "jobPrefix": "ns.comp_pdf",
+    "streamName": "ns.comp_pdf",
+    "maxRunSecond": 86400,
+    "mask": "*.pdf",
+    "tmpPrefix": "tmp_"
+  },
+  {
+    "rootDir": "C:\\temp\\pdfs",
+    "ageDays": 1,
+    "replaceOriginal": false,
+    "maxProcess": 10,
+    "scriptName": "c:\\tools\\compress-pdf\\compress-jpg.ps1",
+    "jobPrefix": "ns.comp_jpg",
+    "streamName": "ns.comp_jpg",
+    "maxRunSecond": 86400,
+    "mask": "*.jpg",
+    "tmpPrefix": "tmp_"
+  }
+]
