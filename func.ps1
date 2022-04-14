@@ -61,7 +61,7 @@ function Process-job($Prefix)
             {
             Print-Message $(Get-FunctionName) 'Error' "Process $($result.filePathOriginal)"
             Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Errorcode $($result.exitCode)"
-            Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)"
+            if ($null -ne $result.errorMessage) { Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)" }
             }
         foreach ($l in $result.log) { Write-Verbose "$(Get-date):$(Get-FunctionName) - $($job.name) - $l"}
         Remove-job $job.id
