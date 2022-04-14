@@ -147,6 +147,7 @@ try {
         catch
             {
             Print-Message $(Get-FunctionName) 'Error' "File $($fileSelect.fullname) $_"
+            continue
             }
         # Check runtime limit
         if ($(get-date) -gt $EstimatedStopTime)
@@ -156,10 +157,6 @@ try {
             }
         }
 
-    # process retain jobs
-    Get-Job | Where-Object{$_.name -match $JobPrefix} | Wait-Job | out-null
-    Process-job $JobPrefix
-    Print-Message $(Get-FunctionName) 'Info' "Save spaces $([math]::round((Get-ReportSave $ProcessFiles $StreamName)/1mb,2)) MB"
     }
 catch
     {
@@ -167,6 +164,10 @@ catch
     }
 finally
     {
+    # process retain jobs
+    Get-Job | Where-Object{$_.name -match $JobPrefix} | Wait-Job | Out-null
+    Process-job $JobPrefix
+    Print-Message $(Get-FunctionName) 'Info' "Save spaces $([math]::round((Get-ReportSave $ProcessFiles $StreamName)/1mb,2)) MB"
     $EndTime = get-date
     Print-Message $(Get-FunctionName) 'Info' "Work time $($EndTime-$StartTime)"
     Print-Message $(Get-FunctionName) 'Info' "End script"

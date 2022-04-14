@@ -144,8 +144,8 @@ function start-modify {
     # set process param
     $pinfo = New-Object System.Diagnostics.ProcessStartInfo
     $pinfo.FileName = $exePath
-    $pinfo.RedirectStandardError = $true
-    $pinfo.RedirectStandardOutput = $true
+    $pinfo.RedirectStandardError = $false
+    $pinfo.RedirectStandardOutput = $false
     $pinfo.UseShellExecute = $false
     $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     # hide window
@@ -163,7 +163,7 @@ function start-modify {
         if ($result.exitcode -ne 0)
             {
             $result.log += ("Process exit with exitcode $($p.exitcode)")
-            $result.errormessage = $($p.StandardError.ReadToEnd().trim())
+            #$result.errormessage = $($p.StandardError.ReadToEnd().trim())
             #Clean tmp file
             if (Test-Path $filePathTemp)
                 {
