@@ -23,8 +23,13 @@ function Print-Message
     }
 
 function Get-FunctionName {
-        (Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name;
+        $delim='\'
+        $notcontains = @('<ScriptBlock>','Get-FunctionName')
+        $func = (Get-PSCallStack).Command | Where-Object {$notcontains -notcontains $_}
+        return [string]::join($delim,$func)
+        #(Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name;
     }
+
 function Get-ReportSave ([string[]]$Files,$StreamName)
     {
     <#
