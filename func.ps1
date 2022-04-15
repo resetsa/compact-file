@@ -1,7 +1,10 @@
 #requires -version 3.0
-
 function Print-Message 
     {
+    <#
+    .SYNOPSIS
+    Print message
+    #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -22,12 +25,14 @@ function Print-Message
         }
     }
 
-function Get-FunctionName {
-        $delim='\'
-        $notcontains = @('<ScriptBlock>','Get-FunctionName')
-        $func = (Get-PSCallStack).Command | Where-Object {$notcontains -notcontains $_}
-        return [string]::join($delim,$func)
-        #(Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name;
+function Get-FunctionName ([string]$delim='\')
+    {
+    <#
+    .SYNOPSIS
+    Return hierarchy module/func name
+    #>
+    $filters = @('<ScriptBlock>',$(Get-PSCallStack)[0].FunctionName)
+    [string]::join($delim,((Get-PSCallStack).Command | Where-Object {$filters -notcontains $_}))
     }
 
 function Get-ReportSave ([string[]]$Files,$StreamName)
@@ -66,6 +71,7 @@ function Process-job($Prefix)
             {
             Print-Message $(Get-FunctionName) 'Error' "Process $($result.filePathOriginal)"
             Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Errorcode $($result.exitCode)"
+            #Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)"
             if ($null -ne $result.errorMessage) { Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)" }
             }
         foreach ($l in $result.log) { Write-Verbose "$(Get-date):$(Get-FunctionName) - $($job.name) - $l"}
@@ -191,10 +197,10 @@ function start-modify {
                 if  ($fileinfo_original.length -le $fileinfo_temp.length)
                     {
                     $result.log += ("Original file size smaller then temp file size")
-                    $result.log += ("Write info to alt NTFS stream in file $filepath_original")
-                    convertto-json $fileinfo_stream | Set-Content -LiteralPath $filepath_original -stream $alt_streamname -force
-                    $result.log += ("Remove tmp file $($filepath_temp)")
-                    remove-item -LiteralPath $filepath_temp
+                    $result.log += ("Write info to alt NTFS stream in file $filePathOriginal")
+                    convertto-json $fileinfo_stream | Set-Content -LiteralPath $filePathOriginal -stream $streamName -force
+                    $result.log += ("Remove tmp file $($filePathTemp)")
+                    remove-item -LiteralPath $filePathTemp
                     $result.replaceOriginal = $false
                     }
                 else 
@@ -210,7 +216,7 @@ function start-modify {
         }
     catch
         {
-        $result.errormessage = $Error[0].Exception.Message
+        $result.errorMessage = $Error[0].Exception.Message
         }
     finally
         {

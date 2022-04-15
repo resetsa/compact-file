@@ -1,8 +1,7 @@
 #requires -version 3.0
-
 <#
 .SYNOPSIS
-    Script for compress JPGfile.
+    Script for compress JPG file.
 .DESCRIPTION
     Compess JPG file with external tool (ImageMagickfor windows).
     Use parallel jobs and write info into alternative NTFS stream.
@@ -10,17 +9,62 @@
 .NOTES
     Name: compress-jpg
     Author: Stepanenko S
-    Version: 0.1
-    DateCreated: 08.04.2022
+    Version: 0.2
+    DateCreated: 15.04.2022
 .EXAMPLE
-
+    PS C:\tools\compress-pdf> .\compress-jpg.ps1 -rootDir c:\temp\pdfs -ageDays 1 -replaceOriginal $true
+    04/15/2022 22:08:38:compress-jpg.ps1 - Info - Func module C:\tools\compress-pdf\func.ps1 check
+    04/15/2022 22:08:38:compress-jpg.ps1 - Info - Start script
+    04/15/2022 22:08:38:compress-jpg.ps1 - Info - Set variables
+    04/15/2022 22:08:38:compress-jpg.ps1 - Info - Modify path to \\?\c:\temp\pdfs
+    04/15/2022 22:08:38:compress-jpg.ps1 - Info - Clean old jobs ns.comp_jpg*
+    04/15/2022 22:08:38:compress-jpg.ps1 - Info - Enum files in \\?\c:\temp\pdfs
+    04/15/2022 22:08:39:compress-jpg.ps1 - Error - File \\?\c:\temp\pdfs\no rigths here\IMG_0642.JPG Отказано в доступе
+    04/15/2022 22:08:44:Process-job\compress-jpg.ps1 - Error - Process \\?\c:\temp\pdfs\long dirs\[testing]\with spaces\IMG_0656.JPG
+    04/15/2022 22:08:44:Process-job\compress-jpg.ps1 - Error - ns.comp_jpg1710757923 - Errorcode 1
+    04/15/2022 22:08:44:Process-job\compress-jpg.ps1 - Info - Process \\?\c:\temp\pdfs\long dirs\[testing]\with spaces\tmp_IMG_0656.JPG OK
+    04/15/2022 22:08:44:Process-job\compress-jpg.ps1 - Error - Process \\?\c:\temp\pdfs\no rigths here\Victoria476b.jpg
+    04/15/2022 22:08:44:Process-job\compress-jpg.ps1 - Error - ns.comp_jpg1847798253 - Errorcode 1
+    04/15/2022 22:08:44:compress-jpg.ps1 - Info - Save spaces 0 MB
+    04/15/2022 22:08:44:compress-jpg.ps1 - Info - Work time 00:00:05.3181690
+    04/15/2022 22:08:44:compress-jpg.ps1 - Info - End script
 .EXAMPLE
-
+    PS C:\tools\compress-pdf> .\compress-jpg.ps1 -rootDir c:\temp\pdfs -ageDays 1 -Verbose
+    04/15/2022 22:09:05:compress-jpg.ps1 - Info - Func module C:\tools\compress-pdf\func.ps1 check
+    04/15/2022 22:09:05:compress-jpg.ps1 - Info - Start script
+    04/15/2022 22:09:05:compress-jpg.ps1 - Info - Set variables
+    04/15/2022 22:09:05:compress-jpg.ps1 - Info - Modify path to \\?\c:\temp\pdfs
+    ПОДРОБНО: 04/15/2022 22:09:05:compress-jpg.ps1 - Verbose - Check access to \\?\c:\temp\pdfs
+    04/15/2022 22:09:05:compress-jpg.ps1 - Info - Clean old jobs ns.comp_jpg*
+    04/15/2022 22:09:05:compress-jpg.ps1 - Info - Enum files in \\?\c:\temp\pdfs
+    ПОДРОБНО: 04/15/2022 22:09:05:compress-jpg.ps1 - Verbose - Check file \\?\c:\temp\pdfs\long dirs\[testing]\with spaces\IMG_0656.JPG
+    ПОДРОБНО: 04/15/2022 22:09:05:compress-jpg.ps1 - Verbose - Begin process file \\?\c:\temp\pdfs\long dirs\[testing]\with spaces\IMG_0656.JPG
+    ПОДРОБНО: 04/15/2022 22:09:05:compress-jpg.ps1 - Verbose - Run job ns.comp_jpg1829645567 for process file \\?\c:\temp\pdfs\long dirs\[testing]\with
+    spaces\IMG_0656.JPG
+    ...
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: force = True
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: filePathOriginal = \\?\c:\temp\pdfs\no rigths
+    here\Victoria476b.jpg
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: filePathTemp = \\?\c:\temp\pdfs\no rigths
+    here\tmp_Victoria476b.jpg
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: exePath = C:\tools\imagemagick\convert.exe
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: exeArgs = -resize 1920^ -strip -interlace Plane
+    -sampling-factor 4:2:0 -quality 90%  "\\?\c:\temp\pdfs\no rigths here\Victoria476b.jpg" "\\?\c:\temp\pdfs\no rigths here\tmp_Victoria476b.jpg"
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: replaceOriginal = False
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: streamName = ns.comp_jpg
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Start process C:\tools\imagemagick\convert.exe
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Start args -resize 1920^ -strip -interlace Plane -sampling-factor
+    4:2:0 -quality 90%  "\\?\c:\temp\pdfs\no rigths here\Victoria476b.jpg" "\\?\c:\temp\pdfs\no rigths here\tmp_Victoria476b.jpg"
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Process exit with exitcode 1
+    04/15/2022 22:09:11:compress-jpg.ps1 - Info - Save spaces 0 MB
+    04/15/2022 22:09:11:compress-jpg.ps1 - Info - Work time 00:00:06.3750005
+    04/15/2022 22:09:11:compress-jpg.ps1 - Info - End script
+.EXAMPLE
+    PS C:\tools\compress-pdf> .\compress-jpg.ps1 -rootDir c:\temp\pdfs -ageDays 1 -Verbose *>&1 | out-file compress-jpg.log
 #>
 
 # set args and validate
 [CmdletBinding()]
-
 param(
     [string]
     [ValidateScript({Test-Path $_ -PathType "Container"})]
@@ -46,7 +90,6 @@ param(
     # Set prefix name for files
     $tmpPrefix = 'tmp_'
 )
-
 # Job code
 $JobScript = {
     param($filePathOriginal,$filePathTemp,$exePath,$exeArgs,$replaceOriginal,$streamName)
@@ -54,7 +97,6 @@ $JobScript = {
     $ErrorActionPreference = 'stop'
     start-modify $filePathOriginal $filePathTemp $exePath $exeArgs $replaceOriginal $streamName -force
     }
-
 #Main
 $funcModule="$($PSScriptRoot)\func.ps1"
 try {
@@ -67,22 +109,15 @@ catch
     {
     Print-Message (Get-FunctionName) 'Error' $_
     }
-
-
-
 Print-Message $(Get-FunctionName) 'Info' "Start script"
 Set-StrictMode -Version Latest
-
 Print-Message $(Get-FunctionName) 'Info' "Set variables"
 $ErrorActionPreference = "continue"
-
 # set vars (maybe in param)
 $exePath = 'C:\tools\imagemagick\convert.exe'
 $exeArgs = "-resize 1920^ -strip -interlace Plane -sampling-factor 4:2:0 -quality 90% "
-
 $StartTime = get-date
 $EstimatedStopTime = (get-date).addseconds($MaxRunSecond)
-
 # fix for limits 256 chars in path
 if ($RootDir -match '\\\\')
     {
@@ -92,7 +127,6 @@ else
     {
     $RootDir = "\\?\$RootDir"
     }
-
 Print-Message $(Get-FunctionName) 'Info' "Modify path to $($RootDir)"
 try {
     # simple check dir access
@@ -102,10 +136,7 @@ try {
         {
         Throw ("Error access to $($RootDir)")
         }
-    
-
     $ProcessFiles = @()
-
     Print-Message $(Get-FunctionName) 'Info' "Clean old jobs $($JobPrefix)*"
     # remove old jobs, if exists
     Get-Job | Where-Object {$_.name -match $JobPrefix} | Remove-Job -Force

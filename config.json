@@ -4,7 +4,7 @@
     "rootDir": "C:\\temp\\pdfs",
     "ageDays": 1,
     "replaceOriginal": true,
-    "maxProcess": 2,
+    "maxProcess": 1,
     "jobPrefix": "ns.comp_pdf",
     "streamName": "ns.comp_pdf",
     "maxRunSecond": 86400,
