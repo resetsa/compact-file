@@ -15,7 +15,7 @@
     "rootDir": "C:\\temp\\pdfs",
     "ageDays": 1,
     "replaceOriginal": true,
-    "maxProcess": 1,
+    "maxProcess": 2,
     "scriptName": "c:\\tools\\compress-pdf\\compress-jpg.ps1",
     "jobPrefix": "ns.comp_jpg",
     "streamName": "ns.comp_jpg",

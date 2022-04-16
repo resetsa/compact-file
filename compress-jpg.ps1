@@ -118,16 +118,22 @@ $exePath = 'C:\tools\imagemagick\convert.exe'
 $exeArgs = "-resize 1920^ -strip -interlace Plane -sampling-factor 4:2:0 -quality 90% "
 $StartTime = get-date
 $EstimatedStopTime = (get-date).addseconds($MaxRunSecond)
+
 # fix for limits 256 chars in path
-if ($RootDir -match '\\\\')
+# posh 7 not support \\?\ syntax
+if ($host.version.Major -lt 7)
     {
-    $RootDir = $RootDir.replace('\\','\\?\UNC\')
+    Print-Message $(Get-FunctionName) 'Info' "Modify path to $($RootDir)"
+    if ($RootDir -match '\\\\')
+        {
+        $RootDir = $RootDir.replace('\\','\\?\UNC\')
+        }
+    else
+        {
+        $RootDir = "\\?\$RootDir"
+        }
     }
-else
-    {
-    $RootDir = "\\?\$RootDir"
-    }
-Print-Message $(Get-FunctionName) 'Info' "Modify path to $($RootDir)"
+
 try {
     # simple check dir access
     Print-Message $(Get-FunctionName) 'Verbose' "Check access to $($RootDir)"
