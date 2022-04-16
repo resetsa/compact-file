@@ -43,10 +43,8 @@
     spaces\IMG_0656.JPG
     ...
     ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: force = True
-    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: filePathOriginal = \\?\c:\temp\pdfs\no rigths
-    here\Victoria476b.jpg
-    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: filePathTemp = \\?\c:\temp\pdfs\no rigths
-    here\tmp_Victoria476b.jpg
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: filePathOriginal = \\?\c:\temp\pdfs\no rigthshere\Victoria476b.jpg
+    ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: filePathTemp = \\?\c:\temp\pdfs\no rigthshere\tmp_Victoria476b.jpg
     ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: exePath = C:\tools\imagemagick\convert.exe
     ПОДРОБНО: 04/15/2022 22:09:11:Process-job\compress-jpg.ps1 - ns.comp_jpg350218958 - Args: exeArgs = -resize 1920^ -strip -interlace Plane
     -sampling-factor 4:2:0 -quality 90%  "\\?\c:\temp\pdfs\no rigths here\Victoria476b.jpg" "\\?\c:\temp\pdfs\no rigths here\tmp_Victoria476b.jpg"

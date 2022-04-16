@@ -91,7 +91,7 @@ param(
 )
 
 Set-StrictMode -Version Latest
-function Initialize-config ([PSObject]$dir,[string[]]$mandatoryNames)
+function Initialize-Config ([PSObject]$dir,[string[]]$mandatoryNames)
     {
     $result = $true
     try 
