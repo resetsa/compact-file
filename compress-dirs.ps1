@@ -1,5 +1,4 @@
 #requires -version 3.0
-
 <#
 .SYNOPSIS
     Script for many folders processing
