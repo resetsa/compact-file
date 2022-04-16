@@ -1,9 +1,9 @@
 #requires -version 3.0
 <#
 .SYNOPSIS
-    Script for many folders processing
+    Simple script for many folders processing.
 .DESCRIPTION
-    Config with json files, each records process with selected script
+    Config with json files, each records process with selected script.
 .NOTES
     Name: compress-dirs
     Author: Stepanenko S
@@ -91,7 +91,7 @@ param(
 )
 
 Set-StrictMode -Version Latest
-function validate-json ([PSObject]$dir,[string[]]$mandatoryNames)
+function Initialize-config ([PSObject]$dir,[string[]]$mandatoryNames)
     {
     $result = $true
     try 
@@ -132,7 +132,7 @@ try
     $dirs = get-content $configJson | convertfrom-json
     foreach ($dir in $dirs)
         {
-        if (validate-json $dir $mandatoryFields)
+        if (Initialize-config $dir $mandatoryFields)
             {
             $hash_param=@{}
             ForEach ($prop in $dir.psobject.properties)

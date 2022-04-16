@@ -1,5 +1,5 @@
 #requires -version 3.0
-function Print-Message 
+function Write-LogMessage 
     {
     <#
     .SYNOPSIS
@@ -54,7 +54,7 @@ function Get-ReportSave ([string[]]$Files,$StreamName)
     return $result
     }
 
-function Process-job($Prefix)
+function Get-ResultJob($Prefix)
     {
     <#
     .SYNOPSIS
@@ -65,21 +65,21 @@ function Process-job($Prefix)
         $result = Receive-Job $job.id
         if ($result.exitcode -eq 0)
             {
-            Print-Message $(Get-FunctionName) 'Info' "Process $($result.filePathOriginal) OK"
+            Write-LogMessage $(Get-FunctionName) 'Info' "Process $($result.filePathOriginal) OK"
             }
         else
             {
-            Print-Message $(Get-FunctionName) 'Error' "Process $($result.filePathOriginal)"
-            Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Errorcode $($result.exitCode)"
-            #Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)"
-            if ($null -ne $result.errorMessage) { Print-Message $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)" }
+            Write-LogMessage $(Get-FunctionName) 'Error' "Process $($result.filePathOriginal)"
+            Write-LogMessage $(Get-FunctionName) 'Error' "$($job.name) - Errorcode $($result.exitCode)"
+            #Write-LogMessage $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)"
+            if ($null -ne $result.errorMessage) { Write-LogMessage $(Get-FunctionName) 'Error' "$($job.name) - Message $($result.errorMessage)" }
             }
         foreach ($l in $result.log) { Write-Verbose "$(Get-date):$(Get-FunctionName) - $($job.name) - $l"}
         Remove-job $job.id
         }
     foreach ($job in (get-job -state Failed | Where-Object {$_.name -match $Prefix}))
         {
-        Print-Message $(Get-FunctionName) 'Error' "$($job.name) - $($job.ChildJobs[0].JobStateInfo.Reason.Message)"
+        Write-LogMessage $(Get-FunctionName) 'Error' "$($job.name) - $($job.ChildJobs[0].JobStateInfo.Reason.Message)"
         Remove-job $job.id
         }
     }
@@ -94,10 +94,9 @@ function Get-PathPre($filepath,$prefix)
     $result = [string]::join('\',$path_array)
     return $result
     }
-function start-modify {
+function Start-ModifyFile {
     [CmdletBinding()]
     param(
-        [switch]$force,
         [string]
         [ValidateScript({Test-Path -LiteralPath $_ -PathType "Leaf"})]
         [Parameter(Mandatory)]
@@ -119,8 +118,9 @@ function start-modify {
         # Set replace original file
         [bool]$replaceOriginal=$false,
         # Set alternative NTFS stream name for saving info
-        [string]$streamName='ns.mod'
-
+        [string]$streamName='ns.mod',
+        # replace tmp files
+        [switch]$force
     )
 
     Set-StrictMode -Version Latest

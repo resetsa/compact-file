@@ -67,7 +67,7 @@
 [CmdletBinding()]
 param(
     [string]
-    [ValidateScript({Test-Path $_ -PathType "Container"})]
+    [ValidateScript({Test-Path $_ -PathType "Container"},ErrorMessage = "Dir {0} not found.")]
     [Parameter(Mandatory)]
     # Set root dir for processing
     $rootDir,
@@ -88,34 +88,38 @@ param(
     # Set mask for processing files
     [string]$mask = "*.jp*g",
     # Set prefix name for files
-    $tmpPrefix = 'tmp_'
+    $tmpPrefix = 'tmp_',
+    [ValidateScript({Test-Path -LiteralPath $_ -PathType "Leaf"},ErrorMessage = "File {0} not found.")]
+    # Set path to exe
+    $exePath = 'C:\tools\imagemagick\convert.exe',
+    [ValidateSet(1024,1280,1920,2048)]
+    # Set DPI
+    [int]$size=1920
 )
 # Job code
 $JobScript = {
     param($filePathOriginal,$filePathTemp,$exePath,$exeArgs,$replaceOriginal,$streamName)
     Set-StrictMode -Version Latest
     $ErrorActionPreference = 'stop'
-    start-modify $filePathOriginal $filePathTemp $exePath $exeArgs $replaceOriginal $streamName -force
+    Start-ModifyFile $filePathOriginal $filePathTemp $exePath $exeArgs $replaceOriginal $streamName -force
     }
 #Main
 $funcModule="$($PSScriptRoot)\func.ps1"
 try {
     # Load func module
     . $funcModule
-    Print-Message $(Get-FunctionName) 'Info' "Func module $($funcModule) check"
+    Write-LogMessage $(Get-FunctionName) 'Info' "Func module $($funcModule) check"
     $InitScript = get-command $funcModule | Select-Object -ExpandProperty ScriptBlock
     }
 catch
     {
-    Print-Message (Get-FunctionName) 'Error' $_
+    Write-LogMessage (Get-FunctionName) 'Error' $_
     }
-Print-Message $(Get-FunctionName) 'Info' "Start script"
+Write-LogMessage $(Get-FunctionName) 'Info' "Start script"
 Set-StrictMode -Version Latest
-Print-Message $(Get-FunctionName) 'Info' "Set variables"
+Write-LogMessage $(Get-FunctionName) 'Info' "Set variables"
 $ErrorActionPreference = "continue"
-# set vars (maybe in param)
-$exePath = 'C:\tools\imagemagick\convert.exe'
-$exeArgs = "-resize 1920^ -strip -interlace Plane -sampling-factor 4:2:0 -quality 90% "
+$exeArgs = "-resize $($size)^ -strip -interlace Plane -sampling-factor 4:2:0 -quality 90% "
 $StartTime = get-date
 $EstimatedStopTime = (get-date).addseconds($MaxRunSecond)
 
@@ -123,7 +127,7 @@ $EstimatedStopTime = (get-date).addseconds($MaxRunSecond)
 # posh 7 not support \\?\ syntax
 if ($host.version.Major -lt 7)
     {
-    Print-Message $(Get-FunctionName) 'Info' "Modify path to $($RootDir)"
+    Write-LogMessage $(Get-FunctionName) 'Info' "Modify path to $($RootDir)"
     if ($RootDir -match '\\\\')
         {
         $RootDir = $RootDir.replace('\\','\\?\UNC\')
@@ -136,34 +140,34 @@ if ($host.version.Major -lt 7)
 
 try {
     # simple check dir access
-    Print-Message $(Get-FunctionName) 'Verbose' "Check access to $($RootDir)"
+    Write-LogMessage $(Get-FunctionName) 'Verbose' "Check access to $($RootDir)"
     $root = Get-Item -force $RootDir
     if ($null -eq $root)
         {
         Throw ("Error access to $($RootDir)")
         }
     $ProcessFiles = @()
-    Print-Message $(Get-FunctionName) 'Info' "Clean old jobs $($JobPrefix)*"
+    Write-LogMessage $(Get-FunctionName) 'Info' "Clean old jobs $($JobPrefix)*"
     # remove old jobs, if exists
     Get-Job | Where-Object {$_.name -match $JobPrefix} | Remove-Job -Force
-    Print-Message $(Get-FunctionName) 'Info' "Enum files in $($root.fullname)"
+    Write-LogMessage $(Get-FunctionName) 'Info' "Enum files in $($root.fullname)"
     # main process cycle
     foreach ($fileSelect in $root.EnumerateFiles($Mask,[system.io.SearchOption]::AllDirectories))
         {
-        Print-Message $(Get-FunctionName) 'Verbose' "Check file $($fileSelect.fullname)"
+        Write-LogMessage $(Get-FunctionName) 'Verbose' "Check file $($fileSelect.fullname)"
         try 
             {
             # select files for processing.
             # compare age and NTFS stream have
             if (($fileSelect.LastWriteTime -le $(get-date).adddays(-$AgeDays))-and((get-item -Force -Stream * -LiteralPath "$($fileSelect.fullname)").stream -notcontains $StreamName))
                 {
-                Print-Message $(Get-FunctionName) 'Verbose' "Begin process file $($fileSelect.fullname)"
+                Write-LogMessage $(Get-FunctionName) 'Verbose' "Begin process file $($fileSelect.fullname)"
                 $filePathTemp = Get-PathPre $fileSelect.fullname $TmpPrefix
                 # generate name for jobs
                 $JobName = $JobPrefix+$(get-random)
                 # modify args
                 $exeArgsForFile = "$($exeArgs) `"$($fileSelect.fullname)`" `"$filePathTemp`""
-                Print-Message $(Get-FunctionName) 'Verbose' "Run job $JobName for process file $($fileSelect.fullname)"
+                Write-LogMessage $(Get-FunctionName) 'Verbose' "Run job $JobName for process file $($fileSelect.fullname)"
                 # start processing job
                 Start-job -Name $JobName -InitializationScript $InitScript -ScriptBlock $JobScript -ArgumentList $($fileSelect.fullname),$filePathTemp,$exePath,$exeArgsForFile,$replaceOriginal,$streamName | out-null
                 # if over MaxPorcess - wait
@@ -173,18 +177,18 @@ try {
                     Start-Sleep -Seconds 5
                     }
                 # process complete job
-                Process-job $JobPrefix
+                Get-ResultJob $JobPrefix
                 $ProcessFiles += $fileSelect.FullName
                 }
             }
         catch
             {
-            Print-Message $(Get-FunctionName) 'Error' "File $($fileSelect.fullname) $_"
+            Write-LogMessage $(Get-FunctionName) 'Error' "File $($fileSelect.fullname) $_"
             }
         # Check runtime limit
         if ($(get-date) -gt $EstimatedStopTime)
             {
-            Print-Message $(Get-FunctionName) 'Info' "Timeout $($MaxRunSecond) seconds out. Wait all job exited and stopping"
+            Write-LogMessage $(Get-FunctionName) 'Info' "Timeout $($MaxRunSecond) seconds out. Wait all job exited and stopping"
             break
             }
         }
@@ -192,15 +196,15 @@ try {
     }
 catch
     {
-    Print-Message $(Get-FunctionName) 'Error' "$_"
+    Write-LogMessage $(Get-FunctionName) 'Error' "$_"
     }
 finally
     {
     # process retain jobs
     Get-Job | Where-Object{$_.name -match $JobPrefix} | Wait-Job | out-null
-    Process-job $JobPrefix
-    Print-Message $(Get-FunctionName) 'Info' "Save spaces $([math]::round((Get-ReportSave $ProcessFiles $StreamName)/1mb,2)) MB"
+    Get-ResultJob $JobPrefix
+    Write-LogMessage $(Get-FunctionName) 'Info' "Save spaces $([math]::round((Get-ReportSave $ProcessFiles $StreamName)/1mb,2)) MB"
     $EndTime = get-date
-    Print-Message $(Get-FunctionName) 'Info' "Work time $($EndTime-$StartTime)"
-    Print-Message $(Get-FunctionName) 'Info' "End script"
+    Write-LogMessage $(Get-FunctionName) 'Info' "Work time $($EndTime-$StartTime)"
+    Write-LogMessage $(Get-FunctionName) 'Info' "End script"
     } 
