@@ -99,7 +99,7 @@ function Initialize-config ([PSObject]$dir,[string[]]$mandatoryNames)
         $all_prop = ($dir | get-member | Where-Object {$_.MemberType -eq 'NoteProperty'}).Name
         foreach ($prop in $all_prop)
             {
-            Write-Verbose "$(Get-date) - $prop = $($dir.$prop)"
+            Write-Verbose "$(Get-date) - Params: $prop = $($dir.$prop)"
             }
         compare-object $mandatoryNames $all_prop
         if (compare-object $mandatoryNames $all_prop )

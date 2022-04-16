@@ -187,7 +187,7 @@ function Start-ModifyFile {
             $result.log += ("Process exitcode 0")
             if ($replaceOriginal)
                 {
-                $result.log += ("Select remove original file")
+                $result.log += ("Select - Remove original file")
                 $fileinfo_original = get-item -LiteralPath $filePathOriginal
                 $fileinfo_temp = get-item -LiteralPath $filePathTemp
                 $fileinfo_stream = New-Object psobject
