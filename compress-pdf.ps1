@@ -92,7 +92,7 @@
 [CmdletBinding()]
 param(
     [string]
-    [ValidateScript({Test-Path $_ -PathType "Container"},ErrorMessage = "Dir {0} not found.")]
+    [ValidateScript({if (Test-Path -LiteralPath $_ -PathType "Container") {$true} else {throw "Dir $_ not found"}})]
     [Parameter(Mandatory)]
     # Set root dir for processing
     $rootDir,
@@ -114,7 +114,7 @@ param(
     [string]$mask = "*.pdf",
     # Set prefix name for files
     $tmpPrefix = 'tmp_',
-    [ValidateScript({Test-Path -LiteralPath $_ -PathType "Leaf"},ErrorMessage = "File {0} not found.")]
+    [ValidateScript({if (Test-Path -LiteralPath $_ -PathType "Leaf") {$true} else {throw "Path $_ not found"}})]
     # Set path to exe
     [string]$exePath = 'C:\tools\gs\gs9.56.1\bin\gswin64c.exe',
     [ValidateSet(72,100,144,150,300)]
@@ -128,18 +128,22 @@ $JobScript = {
     $ErrorActionPreference = 'stop'
     Start-ModifyFile $filePathOriginal $filePathTemp $exePath $exeArgs $replaceOriginal $streamName -force
     }
-#Main
-$funcModule="$($PSScriptRoot)\func.ps1"
+
+#Split in 2 module, the limit of script that can pass to powershell.exe is 12190 bytes
+$coreModule="$($PSScriptRoot)\core.ps1"
+$jobModule="$($PSScriptRoot)\job.ps1"
 try {
     # Load func module
-    . $funcModule
-    Write-LogMessage $(Get-FunctionName) 'Info' "Func module $($funcModule) check"
-    $InitScript = get-command $funcModule | Select-Object -ExpandProperty ScriptBlock
+    . $coreModule
+    Write-LogMessage $(Get-FunctionName) 'Info' "Core module $($coreModule) load"
+    Write-LogMessage $(Get-FunctionName) 'Info' "Job module $($jobModule) load to init script"
+    $InitScript = get-command $jobModule | Select-Object -ExpandProperty ScriptBlock
     }
 catch
     {
-    Write-LogMessage (Get-FunctionName) 'Error' $_
+    Write-Error $_
     }
+
 Write-LogMessage $(Get-FunctionName) 'Info' "Start script"
 Set-StrictMode -Version Latest
 Write-LogMessage $(Get-FunctionName) 'Info' "Set variables"
@@ -225,7 +229,6 @@ try {
             break
             }
         }
-
     }
 catch
     {

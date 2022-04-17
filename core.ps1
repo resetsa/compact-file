@@ -35,25 +35,6 @@ function Get-FunctionName ([string]$delim='\')
     [string]::join($delim,((Get-PSCallStack).Command | Where-Object {$filters -notcontains $_}))
     }
 
-function Get-ReportSave ([string[]]$Files,$StreamName)
-    {
-    <#
-    .SYNOPSIS
-    Get saved bytes after compress
-    #>
-    $result = 0
-    foreach ($name in $Files)
-        {
-        $CompressFilesize = $OrigFilesize = (get-item -force -literalpath $name).length
-        if ((get-item -force -literalpath $name -Stream *).stream -contains $StreamName)
-            {
-            $OrigFilesize = (get-content -force -literalpath $name -Stream $StreamName | convertfrom-json).length
-            }
-        $result += $OrigFilesize - $CompressFilesize
-        }
-    return $result
-    }
-
 function Get-ResultJob($Prefix)
     {
     <#
@@ -83,6 +64,25 @@ function Get-ResultJob($Prefix)
         Remove-job $job.id
         }
     }
+function Get-ReportSave ([string[]]$Files,$StreamName)
+    {
+    <#
+    .SYNOPSIS
+    Get saved bytes after compress
+    #>
+    $result = 0
+    foreach ($name in $Files)
+        {
+        $CompressFilesize = $OrigFilesize = (get-item -force -literalpath $name).length
+        if ((get-item -force -literalpath $name -Stream *).stream -contains $StreamName)
+            {
+            $OrigFilesize = (get-content -force -literalpath $name -Stream $StreamName | convertfrom-json).length
+            }
+        $result += $OrigFilesize - $CompressFilesize
+        }
+    return $result
+    }
+
 function Get-PathPre($filepath,$prefix)
     <#
     .SYNOPSIS
@@ -94,7 +94,8 @@ function Get-PathPre($filepath,$prefix)
     $result = [string]::join('\',$path_array)
     return $result
     }
-function Start-ModifyFile {
+function Start-ModifyFileAsync 
+    {
     [CmdletBinding()]
     param(
         [string]
@@ -114,15 +115,75 @@ function Start-ModifyFile {
         $exePath,
         [Parameter(Mandatory)]
         # Program to run
-        $exeArgs,
-        # Set replace original file
-        [bool]$replaceOriginal=$false,
-        # Set alternative NTFS stream name for saving info
-        [string]$streamName='ns.mod',
+        $exeArgs,        
         # replace tmp files
         [switch]$force
     )
+    
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'stop'
+     # print all param
+    foreach ($key in $PSBoundParameters.Keys)
+        {
+        Write-LogMessage $(Get-FunctionName) 'Verbose' "Args: $($key) = $($PSBoundParameters[$key])"
+        }
+    $result = [ordered]@{}
+    $result.filePathOriginal = $filePathOriginal
+    $result.filePathTemp = $filePathTemp
+    $result.proc = $null
+    # set process param
+    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+    $pinfo.FileName = $exePath
+    $pinfo.RedirectStandardError = $true
+    $pinfo.RedirectStandardOutput = $true
+    $pinfo.UseShellExecute = $false
+    $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    # hide window
+    $pinfo.CreateNoWindow = $true
+    $pinfo.Arguments = $exeArgs
+    $result.proc = New-Object System.Diagnostics.Process
+    $result.proc.StartInfo = $pinfo
+    try 
+        {
+        Write-LogMessage $(Get-FunctionName) 'Verbose' "Start process for $($filePathOriginal)"
+        if ($result.proc.Start() -eq $true) 
+            {
+            Write-LogMessage $(Get-FunctionName) 'Verbose' "Process $($result.proc.id) will process file $($filePathOriginal)"
+            New-Object -TypeName psobject -Property $result    
+            }
+        else { throw 'Process run started' }
+        }
+    catch 
+        {
+        Write-LogMessage $(Get-FunctionName) 'Error' "$_"
+        break
+        }
+    }
 
+function Get-ModifyAsyncResult 
+    {
+    [CmdletBinding()]
+    param(
+        [System.Diagnostics.Process]
+        [ValidateNotNullOrEmpty()]
+        [Parameter(Mandatory)]
+        # File path for processing
+        $process,
+        [string]
+        [ValidateScript({Test-Path -LiteralPath $_ -PathType "Leaf"})]
+        [Parameter(Mandatory)]
+        # File path for processing
+        $filePathOriginal,
+        [string]
+        [Parameter(Mandatory)]
+        # Tmp file path
+        $filePathTemp,
+        # Set replace original file
+        [bool]$replaceOriginal=$false,
+        # Set alternative NTFS stream name for saving info
+        [string]$streamName='ns.mod'
+    )
+        
     Set-StrictMode -Version Latest
     $ErrorActionPreference = 'stop'
     function Copy-Property{
@@ -136,58 +197,25 @@ function Start-ModifyFile {
         $property | Foreach-Object {$propHash+=@{$_=$SourceObject.$_}}
         $inputObject | Add-Member -NotePropertyMembers $propHash @passthruHash
         }
-
-    # create result hashtable
-    $result=[ordered]@{}
-    $result.filePathOriginal = $filePathOriginal
-    $result.filePathTemp = $filePathTemp
-    $result.exitCode = 255
-    $result.errorMessage = $null
-    $result.replaceOriginal = $replaceOriginal
-    $result.log = @()
-
-    # print all param
-    foreach ($key in $PSBoundParameters.Keys)
-        {
-        $result.log += ("Args: $($key) = $($PSBoundParameters[$key])")        
-        }
-    
-    # set process param
-    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
-    $pinfo.FileName = $exePath
-    $pinfo.RedirectStandardError = $false
-    $pinfo.RedirectStandardOutput = $false
-    $pinfo.UseShellExecute = $false
-    $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    # hide window
-    $pinfo.CreateNoWindow = $true
-    $pinfo.Arguments = $exeArgs
-    $p = New-Object System.Diagnostics.Process
-    $p.StartInfo = $pinfo
+    # process result info
     try {
-        $result.log += ("Start process $($pinfo.FileName)")
-        $result.log += ("Start args $($pinfo.Arguments)")
-        $p.Start() | Out-Null
-        $p.WaitForExit()
-        $result.exitcode = $p.exitcode
+        Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Exit with exitcode $($process.exitcode)"
         # check compact ok
-        if ($result.exitcode -ne 0)
+        if ($process.exitcode -ne 0)
             {
-            $result.log += ("Process exit with exitcode $($p.exitcode)")
-            #$result.errormessage = $($p.StandardError.ReadToEnd().trim())
             #Clean tmp file
             if (Test-Path $filePathTemp)
                 {
-                $result.log += ("Remove tmp file $($filePathTemp)")
+                Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Remove tmp file $($filePathTemp)"
                 Remove-Item $filePathTemp
                 }
+            throw ("$($process.StandardError.ReadToEnd().trim())")
             }
         else
             {
-            $result.log += ("Process exitcode 0")
             if ($replaceOriginal)
                 {
-                $result.log += ("Select - Remove original file")
+                Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Selected replace original file"
                 $fileinfo_original = get-item -LiteralPath $filePathOriginal
                 $fileinfo_temp = get-item -LiteralPath $filePathTemp
                 $fileinfo_stream = New-Object psobject
@@ -196,32 +224,28 @@ function Start-ModifyFile {
                 #in some case tmp file size over original (
                 if  ($fileinfo_original.length -le $fileinfo_temp.length)
                     {
-                    $result.log += ("Original file size smaller then temp file size")
-                    $result.log += ("Write info to alt NTFS stream in file $filePathOriginal")
+                    Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Original file size smaller then temp file size"
+                    Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Write info to alt NTFS stream in file $filePathOriginal"
                     convertto-json $fileinfo_stream | Set-Content -LiteralPath $filePathOriginal -stream $streamName -force
-                    $result.log += ("Remove tmp file $($filePathTemp)")
+                    Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Remove tmp file $($filePathTemp)"
                     remove-item -LiteralPath $filePathTemp
-                    $result.replaceOriginal = $false
                     }
                 else 
                     {
-                    $result.log += ("Write info to alt NTFS stream in file $filePathOriginal")
+                    Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Write info to alt NTFS stream in file $filePathOriginal"
                     convertto-json $fileinfo_stream | Set-Content -LiteralPath $filePathTemp -stream $streamName -force
-                    $result.log += ("Move to original file $($filePathOriginal)")
+                    Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Move to original file $($filePathOriginal)"
                     Move-Item -LiteralPath $filePathTemp -Destination $filePathOriginal -Force
-                    $result.replaceOriginal = $true
                     }
                 }
+            Write-LogMessage $(Get-FunctionName) 'Info' "$($process.id) - File $filePathOriginal process OK"
             }
         }
     catch
         {
-        $result.errorMessage = $Error[0].Exception.Message
-        }
-    finally
-        {
-        # Return result object
-        New-Object -TypeName psobject -Property $result
+        Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - Run process for $($filePathOriginal)"
+        Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - Exit code $($process.exitcode)"
+        Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - $_"
         }
     }
 

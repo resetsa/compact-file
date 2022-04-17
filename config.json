@@ -1,6 +1,6 @@
 [
   {
-    "scriptName": "c:\\tools\\compress-pdf\\compress-pdf.ps1",
+    "scriptName": "c:\\tools\\compress-pdf\\compress-ap_pdf.ps1",
     "rootDir": "C:\\temp\\pdfs",
     "ageDays": 1,
     "replaceOriginal": true,
@@ -16,7 +16,7 @@
     "ageDays": 1,
     "replaceOriginal": true,
     "maxProcess": 2,
-    "scriptName": "c:\\tools\\compress-pdf\\compress-jpg.ps1",
+    "scriptName": "c:\\tools\\compress-pdf\\compress-ap_jpg.ps1",
     "jobPrefix": "ns.comp_jpg",
     "streamName": "ns.comp_jpg",
     "maxRunSecond": 86400,
