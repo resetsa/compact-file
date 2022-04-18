@@ -134,8 +134,8 @@ function Start-ModifyFileAsync
     # set process param
     $pinfo = New-Object System.Diagnostics.ProcessStartInfo
     $pinfo.FileName = $exePath
-    $pinfo.RedirectStandardError = $true
-    $pinfo.RedirectStandardOutput = $true
+    $pinfo.RedirectStandardError = $false
+    $pinfo.RedirectStandardOutput = $false
     $pinfo.UseShellExecute = $false
     $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     # hide window
@@ -209,7 +209,7 @@ function Get-ModifyAsyncResult
                 Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Remove tmp file $($filePathTemp)"
                 Remove-Item $filePathTemp
                 }
-            throw ("$($process.StandardError.ReadToEnd().trim())")
+            throw ("INVALID_ERRORLEVEL")
             }
         else
             {
@@ -245,7 +245,7 @@ function Get-ModifyAsyncResult
         {
         Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - Run process for $($filePathOriginal)"
         Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - Exit code $($process.exitcode)"
-        Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - $_"
+        #Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - $_"
         }
     }
 
