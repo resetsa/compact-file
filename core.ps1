@@ -134,8 +134,8 @@ function Start-ModifyFileAsync
     # set process param
     $pinfo = New-Object System.Diagnostics.ProcessStartInfo
     $pinfo.FileName = $exePath
-    $pinfo.RedirectStandardError = $true
-    $pinfo.RedirectStandardOutput = $true
+    $pinfo.RedirectStandardError = $false
+    $pinfo.RedirectStandardOutput = $false
     $pinfo.UseShellExecute = $false
     $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     # hide window
