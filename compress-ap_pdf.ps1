@@ -226,7 +226,7 @@ try
             Write-LogMessage $(Get-FunctionName) 'Verbose' "Process result from $($proc.proc.id)"
             Get-ModifyAsyncResult $proc.proc $proc.filePathOriginal $proc.filePathTemp $replaceOriginal $streamName
             [void]$StartedProcess.Remove($proc)
-            $ProcessFiles += $fileSelect.FullName
+            $ProcessFiles += $proc.filePathOriginal
             }
         # Check runtime limit
         if ($(get-date) -gt $EstimatedStopTime)
@@ -257,7 +257,7 @@ finally
         Write-LogMessage $(Get-FunctionName) 'Verbose' "Process result from $($proc.proc.id)"
         Get-ModifyAsyncResult $proc.proc $proc.filePathOriginal $proc.filePathTemp $replaceOriginal $streamName
         [void]$StartedProcess.Remove($proc)
-        $ProcessFiles += $fileSelect.FullName
+        $ProcessFiles += $proc.filePathOriginal
         }
     Write-LogMessage $(Get-FunctionName) 'Info' "Save spaces $([math]::round((Get-ReportSave $ProcessFiles $StreamName)/1mb,2)) MB"
     $EndTime = get-date

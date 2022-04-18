@@ -73,12 +73,12 @@ function Get-ReportSave ([string[]]$Files,$StreamName)
     $result = 0
     foreach ($name in $Files)
         {
-        $CompressFilesize = $OrigFilesize = (get-item -force -literalpath $name).length
         if ((get-item -force -literalpath $name -Stream *).stream -contains $StreamName)
             {
+            $CompressFilesize = (get-item -force -literalpath $name).length
             $OrigFilesize = (get-content -force -literalpath $name -Stream $StreamName | convertfrom-json).length
+            $result += $OrigFilesize - $CompressFilesize
             }
-        $result += $OrigFilesize - $CompressFilesize
         }
     return $result
     }
