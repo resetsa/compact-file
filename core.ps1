@@ -216,8 +216,8 @@ function Get-ModifyAsyncResult
             if ($replaceOriginal)
                 {
                 Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Selected replace original file"
-                $fileinfo_original = get-item -LiteralPath $filePathOriginal
-                $fileinfo_temp = get-item -LiteralPath $filePathTemp
+                $fileinfo_original = get-item -force -LiteralPath $filePathOriginal
+                $fileinfo_temp = get-item -force -LiteralPath $filePathTemp
                 $fileinfo_stream = New-Object psobject
                 $fileinfo_stream | Copy-Property -SourceObject $fileinfo_original -Property fullname,length,CreationTime,LastAccessTime,LastWriteTime -Passthru | out-null
                 $fileinfo_stream | Add-Member -MemberType NoteProperty -Name 'Compressed' -Value $true
