@@ -209,7 +209,7 @@ function Get-ModifyAsyncResult
                 Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Remove tmp file $($filePathTemp)"
                 Remove-Item $filePathTemp
                 }
-            throw ("INVALID_ERRORLEVEL")
+            throw ("Exit code $($process.exitcode)")
             }
         else
             {
@@ -245,8 +245,7 @@ function Get-ModifyAsyncResult
     catch
         {
         Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - Run process for $($filePathOriginal)"
-        Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - Exit code $($process.exitcode)"
-        #Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - $_"
+        Write-LogMessage $(Get-FunctionName) 'Error' "$($process.id) - $_"
         }
     }
 
