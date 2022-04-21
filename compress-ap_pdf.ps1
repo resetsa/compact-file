@@ -104,7 +104,7 @@
 [CmdletBinding()]
 param(
     [string]
-    [ValidateScript({Test-Path $_ -PathType "Container"})]
+    [ValidateScript({if (Test-Path -LiteralPath $_ -PathType "Container") {$true} else {throw "Dir $_ not found"}})]
     [Parameter(Mandatory)]
     # Set root dir for processing
     $rootDir,
@@ -126,7 +126,7 @@ param(
     [string]$mask = "*.pdf",
     # Set prefix name for files
     $tmpPrefix = 'tmp_',
-    [ValidateScript({Test-Path -LiteralPath $_ -PathType "Leaf"})]
+    [ValidateScript({if (Test-Path -LiteralPath $_ -PathType "Leaf") {$true} else {throw "Path $_ not found"}})]
     # Set path to exe
     [string]$exePath = 'C:\tools\gs\gs9.56.1\bin\gswin64c.exe',
     [ValidateSet(72,100,144,150,300)]
