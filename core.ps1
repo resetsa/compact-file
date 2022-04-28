@@ -226,7 +226,7 @@ function Get-ModifyAsyncResult
                     {
                     Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Original file size smaller then temp file size"
                     Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Write info to alt NTFS stream in file $filePathOriginal"
-                    if ($filePathOriginal.IsReadOnly) {Set-ItemProperty -LiteralPath $filePathOriginal -Name IsReadOnly -Value $false}
+                    if ($fileinfo_original.IsReadOnly) {Set-ItemProperty -LiteralPath $filePathOriginal -Name IsReadOnly -Value $false}
                     convertto-json $fileinfo_stream | Set-Content -LiteralPath $filePathOriginal -stream $streamName -force
                     Write-LogMessage $(Get-FunctionName) 'Verbose' "$($process.id) - Remove tmp file $($filePathTemp)"
                     remove-item -LiteralPath $filePathTemp
