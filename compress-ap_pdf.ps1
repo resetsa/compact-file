@@ -154,7 +154,7 @@ $exeArgs = -join @(
     "-dEmbedAllFonts=true -dSubsetFonts=true -dPDFSETTINGS=/ebook "
     "-dColorImageDownsampleType=/Bicubic -dColorImageResolution=$($dpi) -dColorImageDownsampleThreshold=1 "
     "-dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=$($dpi) -dGrayImageDownsampleThreshold=1 "
-    "-dMonoImageDownsampleType=/Subsample -dMonoImageResolution=$($dpi) "
+#    "-dMonoImageDownsampleType=/Subsample -dMonoImageResolution=$($dpi) "
     "-dPassThroughJPEGImages=false -dColorImageFilter=/DCTEncode -dGrayImageFilter=/DCTEncode -dMonoImageFilter=/CCITTFaxEncode"
     )
 $StartTime = get-date
