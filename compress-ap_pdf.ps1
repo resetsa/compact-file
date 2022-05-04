@@ -200,6 +200,7 @@ try
                 {
                 Write-LogMessage $(Get-FunctionName) 'Verbose' "Begin process file $($fileSelect.fullname)"
                 $filePathTemp = Get-PathPre $fileSelect.fullname $TmpPrefix
+                # modify args and fix % for gswin64c
                 $exeArgsForFile = "$($exeArgs) -sDEVICE=pdfwrite -sOutputFile=`"$($filePathTemp -replace "%","%%")`" `"$($fileSelect.fullname)`""
                 Write-LogMessage $(Get-FunctionName) 'Verbose' "Run for process file $($fileSelect.fullname)"
                 # start processing job
