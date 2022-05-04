@@ -131,7 +131,9 @@ param(
     [string]$exePath = 'C:\tools\gs\gs9.56.1\bin\gswin64c.exe',
     [ValidateSet(72,100,144,150,300)]
     # Set DPI
-    [int]$dpi=144
+    [int]$dpi=144,
+    # Set Max CPU time in seconds
+    [int]$maxCpuTime=600
 )
 
 $coreModule="$($PSScriptRoot)\core.ps1"
@@ -159,6 +161,7 @@ $exeArgs = -join @(
     )
 $StartTime = get-date
 $EstimatedStopTime = (get-date).addseconds($MaxRunSecond)
+$MaxProcessCpuTime = New-TimeSpan -Seconds $maxCpuTime
 
 # fix for limits 256 chars in path
 # posh 7 not support \\?\ syntax
@@ -213,9 +216,18 @@ try
             Write-LogMessage $(Get-FunctionName) 'Error' "File $($fileSelect.fullname) $_"
             continue
             }
-            # if over MaxPorcess - wait
+        # if over MaxProcess - wait
         while (@($StartedProcess | Where-Object{$_.proc.hasExited -eq $false}).count -ge $MaxProcess)
             {
+            # check and kill hung process
+            foreach ($proc in @($StartedProcess | Where-Object{$_.proc.hasExited -eq $false}))
+                {   
+                if ($proc.proc.TotalProcessorTime -gt $MaxProcessCpuTime)
+                    {
+                    Write-LogMessage $(Get-FunctionName) 'Verbose' "Process $($proc.proc.id) hung. Stop it"
+                    $proc.proc.kill()
+                    }
+                }
             # maybe very small?
             Write-LogMessage $(Get-FunctionName) 'Verbose' "Maxprocess $($MaxProcess) was reached. Waiting finish running process"
             Start-Sleep -Seconds 10
@@ -228,7 +240,7 @@ try
             [void]$StartedProcess.Remove($proc)
             $ProcessFiles += $proc.filePathOriginal
             }
-        # Check runtime limit
+        # check runtime limit
         if ($(get-date) -gt $EstimatedStopTime)
             {
             Write-LogMessage $(Get-FunctionName) 'Info' "Timeout $($MaxRunSecond) seconds out. Wait all job exited and stopping"
@@ -246,9 +258,18 @@ finally
     # wait finish process
     while (@($StartedProcess | Where-Object{$_.proc.hasExited -ne $true}).count -ge 1)
         {
+        # check and kill hung process
+        foreach ($proc in @($StartedProcess | Where-Object{$_.proc.hasExited -eq $false}))
+            {   
+            if ($proc.proc.TotalProcessorTime -gt $MaxProcessCpuTime)
+                {
+                Write-LogMessage $(Get-FunctionName) 'Verbose' "Process $($proc.proc.id) hung. Stop it"
+                $proc.proc.kill()
+                }
+            }
         # maybe very small?
-        Start-Sleep -Seconds 10
         Write-LogMessage $(Get-FunctionName) 'Verbose' "Waiting end remaining process"
+        Start-Sleep -Seconds 10
         }
 
     # process complete job
