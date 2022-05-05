@@ -18,7 +18,7 @@ function Start-ModifyFile {
         # Program to run
         $exePath,
         [Parameter(Mandatory)]
-        # Program to run
+        # Program args
         $exeArgs,
         # Set replace original file
         [bool]$replaceOriginal=$false,
